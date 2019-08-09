@@ -207,13 +207,10 @@ class HumanAgent(Agent):
 			
 			try:
 				first, second = inp.lower().split(' ')
-				print(first, second)
 				x = ord(first[0]) - ord('a')
-				print(x)
 				y = int(first[1])
-				print(y)
 				card_index, move_index = action_mapping[int(second)]
-				print(card_index, move_index)
+#				print(card_index, move_index)
 			except:
 				raise
 				#continue
