@@ -149,19 +149,21 @@ class HumanAgent(Agent):
 		other_turn = 1 - turn
 		
 		print(colored_by_turn("Opponent has:", other_turn))
-		for card in state.cards_by_player[other_turn]:
+		for card_no in state.cards_by_player[other_turn]:
 			print('\t', end = '')
 #			if state.card_index_to_swap is not None and state.cards_by_player[state.card_index_to_swap] is card:
 #				print("[USED]", end = '')
 #			for dx, dy in card[turn]:
 			#For Visibility
+			card = env.cards[card_no]
 			for dx, dy in card[other_turn]:
 				print('({: 2},{: 2}) '.format(dx, dy), end = '')
 			print()
 
 		print("Card to swap:")
 		print('\t', end = '')
-		for dx, dy in state.card_index_to_swap[turn]:
+		card_to_swap = env.cards[state.card_index_to_swap]
+		for dx, dy in card_to_swap[turn]:
 			print('({: 2},{: 2}) '.format(dx, dy), end = '')
 		print()
 		
@@ -173,11 +175,14 @@ class HumanAgent(Agent):
 			print("No moves. Pick card (0/1) to swap.")
 		else:
 			print(colored_by_turn("My cards:", turn))
-			for card_index, card in enumerate(state.cards_by_player[turn]):
+			for card_index, card_no in enumerate(state.cards_by_player[turn]):
 				print('\t', end = '')
+				card = env.cards[card_no]
+#				print(card_index,card_no,card)
 				for move_index, (dx, dy) in enumerate(card[turn]):
 					print('{}:({: 2},{: 2}) '.format(len(action_mapping), dx, dy), end = '')
-					action_mapping.append((card_index, move_index))
+#					action_mapping.append((card_index, move_index))
+					action_mapping.append((card_index, move_index, card_no))
 				print()
 		
 		return self._get_action(must_pass, action_mapping, actions)
@@ -209,16 +214,21 @@ class HumanAgent(Agent):
 				first, second = inp.lower().split(' ')
 				x = ord(first[0]) - ord('a')
 				y = int(first[1])
-				card_index, move_index = action_mapping[int(second)]
+#				card_index, move_index = action_mapping[int(second)]
+				card_index, move_index, card_no = action_mapping[int(second)]
 #				print(card_index, move_index)
 			except:
 				raise
 				#continue
 			
-			action = (card_index, move_index, x, y)
+#			action = (card_index, move_index, x, y)
+			action = (card_no, move_index, x, y)
+#			print("action: ", action)
 			if action in actions:
 #				return a_selected
 				return action
+			else:
+				print("invalid move")
 
 def colored_by_turn(txt, turn):
 	c = (col.Fore.MAGENTA if turn == 0 else col.Fore.CYAN)

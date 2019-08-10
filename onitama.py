@@ -13,6 +13,9 @@ SIZE = 2*MIDDLE + 1
 FILE_LETTERS = 'abcde'
 
 class OnitamaEnv(gym.Env):
+	def __init__(self):
+		self.cards = CARDS
+
 	def seed(self, seed = None):
 		seed = seeding.create_seed(seed)
 		self.random = random.Random(seed)
@@ -21,7 +24,8 @@ class OnitamaEnv(gym.Env):
 	def reset(self):
 		self.ply = 0
 #		self.state = State.Start(list(self.random.sample(CARDS, 4)), self.random.randrange(2))
-		self.state = State.Start(list(self.random.sample(CARDS, 5)), self.random.randrange(2))
+#		self.state = State.Start(list(self.random.sample(CARDS, 5)), self.random.randrange(2))
+		self.state = State.Start(self.cards, list(self.random.sample(list(range(len(self.cards))), 5)), self.random.randrange(2))
 	
 	def render(self, mode = 'human', close = False):
 		if close: return
@@ -42,17 +46,18 @@ class OnitamaEnv(gym.Env):
 
 class State:
 	@classmethod
-	def Start(cls, cards, turn):
+	def Start(cls, cards, sel_cards, turn):
 		board = np.zeros((SIZE, SIZE), dtype = np.int8)
 		board[0,:] |= PLAYER_MARK[0]
 		board[0,MIDDLE] |= MASTER_MARK
 		board[-1,:] |= PLAYER_MARK[1]
 		board[-1,MIDDLE] |= MASTER_MARK
 #		return cls(turn, [cards[:2], cards[2:]], None, board)
-		return cls(turn, [cards[:2], cards[2:4]], cards[4], board)
+		return cls(turn, cards, [sel_cards[:2], sel_cards[2:4]], sel_cards[4], board)
 	
-	def __init__(self, turn, cards_by_player, card_index_to_swap, board):
+	def __init__(self, turn, cards, cards_by_player, card_index_to_swap, board):
 		self.turn = turn
+		self.cards = cards
 		self.cards_by_player = cards_by_player
 		self.card_index_to_swap = card_index_to_swap
 		self.board = board
@@ -63,10 +68,12 @@ class State:
 		return s
 	
 	def step_mutate(self, action):
-		card_index = action[0]
-		
 		turn = self.turn
 		other_turn = 1 - turn
+		
+#		card_index = action[0]
+		card_no = action[0]
+		card_index = self.cards_by_player[turn].index(card_no)
 		
 		cbp = self.cards_by_player
 		card = cbp[turn][card_index]
@@ -85,6 +92,7 @@ class State:
 		
 		move_index = action[1]
 		if move_index is not None:
+			card = self.cards[card_no]
 			dx, dy = card[turn][move_index]
 			x1, y1 = action[2:]
 			piece = board[y1,x1]
@@ -101,7 +109,8 @@ class State:
 			self.turn = other_turn
 	
 	def clone(self):
-		return State(self.turn, [list(self.cards_by_player[0]), list(self.cards_by_player[1])], self.card_index_to_swap, np.copy(self.board))
+#		return State(self.turn, [list(self.cards_by_player[0]), list(self.cards_by_player[1])], self.card_index_to_swap, np.copy(self.board))
+		return State(self.turn, self.cards, [list(self.cards_by_player[0]), list(self.cards_by_player[1])], self.card_index_to_swap, np.copy(self.board))
 	
 	def build_actions(self):
 		board = self.board
@@ -112,14 +121,15 @@ class State:
 		for x1 in range(SIZE):
 			for y1 in range(SIZE):
 				if not board[y1,x1] & p: continue
-				for card_index, card in enumerate(cards):
+				for card_index, card_no in enumerate(cards):
+					card = self.cards[card_no]
 					for move_index, (dx, dy) in enumerate(card[turn]):
 						x2 = x1 + dx
 						if not 0 <= x2 < SIZE: continue
 						y2 = y1 + dy
 						if not 0 <= y2 < SIZE: continue
 						if board[y2,x2] & p: continue
-						tmp = (card_index, move_index, x1, y1)
+						tmp = (card_no, move_index, x1, y1)
 						actions.append(tmp)
 		if not actions:
 			# "Pass" moves

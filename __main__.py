@@ -30,8 +30,8 @@ def run_onitama():
 			#RandomAgent(),
 			#BFSAgent(depth = 1, heuristic = random_playout_heuristic(1)),
 			BFSAgent(depth = 3, heuristic = pawn_heuristic),
-			#TreeAgent(expansions = 21, heuristic = pawn_heuristic),
-			HumanAgent()
+			TreeAgent(expansions = 21, heuristic = pawn_heuristic),
+			#HumanAgent()
 		]
 		
 		#print("Seed:", i)
