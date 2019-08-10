@@ -156,6 +156,7 @@ class HumanAgent(Agent):
 #			for dx, dy in card[turn]:
 			#For Visibility
 			card = env.cards[card_no]
+			print(env.cards_names[card_no],": ", end = '')
 			for dx, dy in card[other_turn]:
 				print('({: 2},{: 2}) '.format(dx, dy), end = '')
 			print()
@@ -163,6 +164,7 @@ class HumanAgent(Agent):
 		print("Card to swap:")
 		print('\t', end = '')
 		card_to_swap = env.cards[state.card_index_to_swap]
+		print(env.cards_names[state.card_index_to_swap],": ", end = '')
 		for dx, dy in card_to_swap[turn]:
 			print('({: 2},{: 2}) '.format(dx, dy), end = '')
 		print()
@@ -179,6 +181,7 @@ class HumanAgent(Agent):
 				print('\t', end = '')
 				card = env.cards[card_no]
 #				print(card_index,card_no,card)
+				print(env.cards_names[card_no],": ", end = '')
 				for move_index, (dx, dy) in enumerate(card[turn]):
 					print('{}:({: 2},{: 2}) '.format(len(action_mapping), dx, dy), end = '')
 #					action_mapping.append((card_index, move_index))

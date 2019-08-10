@@ -15,6 +15,7 @@ FILE_LETTERS = 'abcde'
 class OnitamaEnv(gym.Env):
 	def __init__(self):
 		self.cards = CARDS
+		self.cards_names = CARDS_NAMES
 
 	def seed(self, seed = None):
 		seed = seeding.create_seed(seed)
@@ -167,4 +168,21 @@ _CARDS = [
 CARDS = [
 	[c, [(-dx, -dy) for (dx, dy) in c]]
 	for c in _CARDS
+]
+CARDS_NAMES = ["Tiger",
+	"Crab",
+	"Monkey",
+	"Crane",
+	"Dragon",
+	"Elephant",
+	"Mantis",
+	"Boar",
+	"Frog",
+	"Goose",
+	"Horse",
+	"Eel",
+	"Rabbit",
+	"Rooster",
+	"Ox",
+	"Cobra",
 ]
