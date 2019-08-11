@@ -18,27 +18,41 @@ class OnitamaEnv(gym.Env):
 		self.cards = CARDS
 		self.cards_names = CARDS_NAMES
 
-		actions = []
-		self.actions_pos = []
-		for card in _CARDS:
-			for action in card:
-				if action not in actions:
-					actions.append(action)
-					for x in range(SIZE):
-						for y in range(SIZE):
-							action_pos = action + (x,y)
-							self.actions_pos.append(action_pos)
-		for card in _CARDS:
-			for (dx,dy) in card:
-				action = (-dx,-dy)
-				if action not in actions:
-					actions.append(action)
-					for x in range(SIZE):
-						for y in range(SIZE):
-							action_pos = action + (x,y)
-							self.actions_pos.append(action_pos)
+#		actions = []
+#		self.actions_pos = []
+#		for card in _CARDS:
+#			for action in card:
+#				if action not in actions:
+#					actions.append(action)
+#					for x in range(SIZE):
+#						for y in range(SIZE):
+#							action_pos = action + (x,y)
+#							self.actions_pos.append(action_pos)
+#		for card in _CARDS:
+#			for (dx,dy) in card:
+#				action = (-dx,-dy)
+#				if action not in actions:
+#					actions.append(action)
+#					for x in range(SIZE):
+#						for y in range(SIZE):
+#							action_pos = action + (x,y)
+#							self.actions_pos.append(action_pos)
+#
+#		print(actions)
+#		print(self.actions_pos)
 
-		self.action_space = spaces.Discrete(len(self.actions_pos))
+		self.card_action_pos = []
+		for card_no, card in enumerate(self.cards):
+			for move_index, (dx, dy) in enumerate(card[0]):
+				for x in range(SIZE):
+					for y in range(SIZE):
+						tmp = (card_no, move_index, x, y)
+						self.card_action_pos.append(tmp)
+
+#		print(self.card_action_pos)			
+#		print(len(self.card_action_pos))			
+
+		self.action_space = spaces.Discrete(len(self.card_action_pos))
 #		self.observation_space = spaces.Box(low=0, high=255, shape=(screen_height, screen_width, 3), dtype=np.uint8)
 		self.observation_space = spaces.Box(low=0, high=len(PLAYER_MARK)*2+2, shape=(SIZE, SIZE, 1), dtype=np.uint8)
 
