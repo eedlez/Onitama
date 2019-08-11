@@ -3,6 +3,7 @@ import numpy as np
 import colorama as col
 import gym
 from gym.utils import seeding
+from gym import spaces
 
 col.init()
 
@@ -16,6 +17,33 @@ class OnitamaEnv(gym.Env):
 	def __init__(self):
 		self.cards = CARDS
 		self.cards_names = CARDS_NAMES
+
+		actions = []
+		self.actions_pos = []
+		for card in _CARDS:
+			for action in card:
+				if action not in actions:
+					actions.append(action)
+					for x in range(SIZE):
+						for y in range(SIZE):
+							action_pos = action + (x,y)
+							self.actions_pos.append(action_pos)
+		for card in _CARDS:
+			for (dx,dy) in card:
+				action = (-dx,-dy)
+				if action not in actions:
+					actions.append(action)
+					for x in range(SIZE):
+						for y in range(SIZE):
+							action_pos = action + (x,y)
+							self.actions_pos.append(action_pos)
+
+		self.action_space = spaces.Discrete(len(self.actions_pos))
+#		self.observation_space = spaces.Box(low=0, high=255, shape=(screen_height, screen_width, 3), dtype=np.uint8)
+		self.observation_space = spaces.Box(low=0, high=len(PLAYER_MARK)*2+2, shape=(SIZE, SIZE, 1), dtype=np.uint8)
+
+		self.seed()
+		self.reset()
 
 	def seed(self, seed = None):
 		seed = seeding.create_seed(seed)
