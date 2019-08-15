@@ -18,6 +18,11 @@ class OnitamaEnv(gym.Env):
 		self.cards = CARDS
 		self.cards_names = CARDS_NAMES
 
+		self.PLAYER_MARK = [1, 2]
+		self.MASTER_MARK = 4
+		self.MIDDLE = 2
+		self.SIZE = 2*MIDDLE + 1
+
 #		actions = []
 #		self.actions_pos = []
 #		for card in _CARDS:
@@ -54,7 +59,7 @@ class OnitamaEnv(gym.Env):
 
 		self.action_space = spaces.Discrete(len(self.card_action_pos))
 #		self.observation_space = spaces.Box(low=0, high=255, shape=(screen_height, screen_width, 3), dtype=np.uint8)
-		self.observation_space = spaces.Box(low=0, high=len(PLAYER_MARK)*2+2, shape=(SIZE, SIZE, 1), dtype=np.uint8)
+		self.observation_space = spaces.Box(low=0, high=len(PLAYER_MARK)*2+2, shape=(6, SIZE, SIZE), dtype=np.uint8) # Why Shape x,y,1???
 
 		self.seed()
 		self.reset()
@@ -69,6 +74,7 @@ class OnitamaEnv(gym.Env):
 #		self.state = State.Start(list(self.random.sample(CARDS, 4)), self.random.randrange(2))
 #		self.state = State.Start(list(self.random.sample(CARDS, 5)), self.random.randrange(2))
 		self.state = State.Start(self.cards, list(self.random.sample(list(range(len(self.cards))), 5)), self.random.randrange(2))
+		return self.state
 	
 	def render(self, mode = 'human', close = False):
 		if close: return
@@ -79,7 +85,8 @@ class OnitamaEnv(gym.Env):
 	
 	def step(self, action):
 		self.state.step_mutate(action)
-		done = (self.state.turn is None)
+#		done = (self.state.turn is None)
+		done = self.state.done
 		
 		if not done:
 			self.ply += 1
@@ -99,6 +106,7 @@ class State:
 		return cls(turn, cards, [sel_cards[:2], sel_cards[2:4]], sel_cards[4], board)
 	
 	def __init__(self, turn, cards, cards_by_player, card_index_to_swap, board):
+		self.done = False
 		self.turn = turn
 		self.cards = cards
 		self.cards_by_player = cards_by_player
@@ -130,7 +138,7 @@ class State:
 		cbp[turn][card_index] = self.card_index_to_swap
 		self.card_index_to_swap = card
 		
-		done = False
+		self.done = False
 		board = self.board
 		
 		move_index = action[1]
@@ -143,13 +151,14 @@ class State:
 			x2 = x1 + dx
 			y2 = y1 + dy
 			if board[y2,x2] & MASTER_MARK or (piece & MASTER_MARK and x2 == MIDDLE and y2 == (SIZE - 1 if turn == 0 else 0)):
-				done = True
+				self.done = True
 			board[y2,x2] = piece
 		
-		if done:
-			self.turn = None
-		else:
-			self.turn = other_turn
+#		if self.done:
+#			self.turn = None
+#		else:
+#			self.turn = other_turn
+		self.turn = other_turn
 	
 	def clone(self):
 #		return State(self.turn, [list(self.cards_by_player[0]), list(self.cards_by_player[1])], self.card_index_to_swap, np.copy(self.board))
