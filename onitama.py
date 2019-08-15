@@ -185,7 +185,9 @@ class State:
 						actions.append(tmp)
 		if not actions:
 			# "Pass" moves
-			actions.extend((card_index, None) for card_index, _ in enumerate(cards))
+#			actions.extend((card_index, None) for card_index, _ in enumerate(cards))
+			print("Pass")
+			actions.extend((card_index, None) for card_index in cards)
 		return actions
 
 def piece_repr(p: int) -> str:
